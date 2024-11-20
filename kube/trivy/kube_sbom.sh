@@ -26,19 +26,14 @@ docker run --rm \
 
 echo "----- KBOM generation end -----"
 
-if [ ! -d "Caches" ]; then
-    tar zxf trivy_cache.tar.gz
-else
-    echo "Trivy Caches already existent"
-fi
-
+mkdir -p "$HOME"/Library/Caches
 
 echo "----- KBOM vuln scan -----"
 #scan kbom for vulnerabilities
 docker run --rm \
     -it \
     -v "$HOME"/.kube/config-dso-user:/root/.kube/config:z \
-    -v Caches:/root/.cache/:z \
+    -v "$HOME"/Library/Caches:/root/.cache/:z \
     -v ./sboms:/sboms:z \
     -e TRIVY_DB_REPOSITORY="$TRIVY_DB" \
     -e TRIVY_JAVA_DB_REPOSITORY="$TRIVY_DB_JAVA" \

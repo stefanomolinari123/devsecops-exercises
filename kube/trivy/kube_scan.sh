@@ -15,18 +15,15 @@ namespaces=dso-apps
 resources=deployment,pods
 report_type=summary # or all
 
-if [ ! -d "Caches" ]; then
-    tar zxf trivy_cache.tar.gz
-else
-    echo "Trivy Caches already existent"
-fi
+
+mkdir -p "$HOME"/Library/Caches
 
 echo "trivy k8s scan"
 # start scanning k8s cluster @ provided ip
 docker run --rm \
     -it \
     -v "$HOME"/.kube/config-dso-user:/root/.kube/config:z \
-    -v Caches:/root/.cache/:z \
+    -v "$HOME"/Library/Caches:/root/.cache/:z \
     -e TRIVY_DB_REPOSITORY="$TRIVY_DB" \
     -e TRIVY_JAVA_DB_REPOSITORY="$TRIVY_DB_JAVA" \
     --add-host k8scp-dso:"$CLUSTER_IP" \
