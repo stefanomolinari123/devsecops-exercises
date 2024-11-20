@@ -15,10 +15,8 @@ namespaces=dso-apps
 resources=deployment,pods
 report_type=summary # or all
 
-
 mkdir -p "$HOME"/Library/Caches
 
-echo "trivy k8s scan"
 # start scanning k8s cluster @ provided ip
 docker run --rm \
     -it \

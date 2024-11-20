@@ -14,7 +14,6 @@ fi
 #create output directory
 mkdir -p sboms
 
-echo "----- KBOM generation -----"
 #generate kbom
 docker run --rm \
     -v "$HOME"/.kube/config-dso-user:/root/.kube/config:z \
@@ -24,11 +23,8 @@ docker run --rm \
     --format cyclonedx \
     -o /sboms/mykbom.cdx.json
 
-echo "----- KBOM generation end -----"
-
 mkdir -p "$HOME"/Library/Caches
 
-echo "----- KBOM vuln scan -----"
 #scan kbom for vulnerabilities
 docker run --rm \
     -it \
@@ -43,4 +39,3 @@ docker run --rm \
     /sboms/mykbom.cdx.json \
     -o /sboms/mykbom.cdx.vex.json
 
-echo "----- KBOM vuln scan end -----"
