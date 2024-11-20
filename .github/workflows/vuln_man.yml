@@ -8,7 +8,6 @@ jobs:
   sbom:
     name: Generate app SBOM
     runs-on: ubuntu-latest
-
     strategy:
       fail-fast: false
       matrix:
@@ -32,7 +31,12 @@ jobs:
       - name: Generate SBOMs
         run: |
           cd vuln_apps/${{ matrix.project }}
-          cdxgen --format json -o "${{ matrix.project }}_bom.json"
+          cdxgen \
+          --format json \
+          --spec-version="${{matrix.cdx_spec_version}}" \
+          --project-name="${{ matrix.project }}" \
+          --project-version="${{ github.run_number }}" \
+          -o "${{ matrix.project }}_bom.json"
 
       - name: Upload results
         if: always()
@@ -43,12 +47,12 @@ jobs:
           retention-days: 5
           if-no-files-found: error
 
+
 ## Exercise Docker SBOM generation
   # sbom-docker:
   #   name: Generate docker SBOM
   #   runs-on: ubuntu-latest
   #   container: quay.io/pluribus_one/sbom_vex_scanner@sha256:4c93316f95a2fe12bd2683ec34ff36d8e3a29501c797fb4825e7e510bab29ce3
-
   #   strategy:
   #     fail-fast: false
   #     matrix:
@@ -82,12 +86,11 @@ jobs:
   #         -o "${{ project }}-docker_bom.json"
   #         image:tag
 
-
   #     - name: upload Artifacts
   #       uses: actions/upload-artifact@v4
   #       with:
   #         name: sbom-${{matrix.project}}-docker
-  #         path: "/path/to/output/bom.json"
+  #         path: ${{ matrix.project }}-docker_bom.json
   #         retention-days: 5
   #         if-no-files-found: error
 
@@ -129,6 +132,6 @@ jobs:
   #       uses: actions/upload-artifact@v4
   #       with:
   #         name: sbom-${{matrix.project}}-merged
-  #         path: "path/to/file_out.json"
+  #         path: ${{ matrix.project }}_merged_sbom.json
   #         retention-days: 5
   #         if-no-files-found: error
