@@ -101,7 +101,6 @@ Le applicazioni vulnerabili che abbiamo esposto in questa repository sono prese 
 https://owasp.org/www-project-vulnerable-web-applications-directory/
 
 
-
 # Follow Us on Security News
 Restate aggiornati con le ultime news su temi di cybersecurity, effettuando la subscribe al seguente link:  
 https://davideariu.substack.com/
