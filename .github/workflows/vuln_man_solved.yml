@@ -4,27 +4,39 @@ on:
   workflow_dispatch:
 
 jobs:
+## Exercise SBOM generation
   sbom:
     name: Generate app SBOM
     runs-on: ubuntu-latest
-    container: quay.io/pluribus_one/sbom_vex_scanner:latest
-    # outputs:
-    #   sbom: ${{ steps.sbom_app.outputs.bom }}
+
     strategy:
       fail-fast: false
       matrix:
         project: ["dvna", "vulnado"]
+        cdx_spec_version: ["1.5"]
+        include:
+          - project: vulnado
+            cdx_spec_version: "1.5"
+            cdx_image: ghcr.io/cyclonedx/cdxgen-java:v10
+          - project: dvna
+            cdx_spec_version: "1.5"
+            cdx_image:  quay.io/pluribus_one/sbom_vex_scanner@sha256:4c93316f95a2fe12bd2683ec34ff36d8e3a29501c797fb4825e7e510bab29ce3
+    container:
+      image: ${{matrix.cdx_image}}
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
       - name: Generate SBOMs
-        # id: "sbom_app"
         run: |
           cd vuln_apps/${{ matrix.project }}
-          cdxgen --format json -o "${{ matrix.project }}_bom.json"
-        # echo "bom=$(cat ${{ matrix.project }}_bom.json)" >> "$GITHUB_OUTPUT"
+          cdxgen \
+          --format json \
+          --spec-version="${{matrix.cdx_spec_version}}" \
+          --project-name="${{ matrix.project }}" \
+          --project-version="build-${{ github.run_number }}" \
+          -o "${{ matrix.project }}_bom.json"
 
       - name: Upload results
         if: always()
@@ -35,16 +47,17 @@ jobs:
           retention-days: 5
           if-no-files-found: error
 
+## Exercise Docker SBOM generation
   sbom-docker:
     name: Generate docker SBOM
     runs-on: ubuntu-latest
-    container: quay.io/pluribus_one/sbom_vex_scanner:latest
-    # outputs:
-    #   sbom: ${{ steps.sbom_docker.outputs.bom }}
+    container: quay.io/pluribus_one/sbom_vex_scanner@sha256:4c93316f95a2fe12bd2683ec34ff36d8e3a29501c797fb4825e7e510bab29ce3
+
     strategy:
       fail-fast: false
       matrix:
         project: ["dvna", "vulnado"]
+        cdx_spec_version: ["1.5"]
 
     steps:
       - name: Checkout Repository
@@ -63,11 +76,16 @@ jobs:
           tags: ${{ matrix.project }}:latest
 
       - name: Generate docker SBOMs
-        # id: "sbom_docker"
-        run: |
-          cdxgen --type docker -o "${{ matrix.project }}-docker_bom.json" ${{ matrix.project }}:latest
-        # cat ${{ matrix.project }}-docker_bom.json
-        # echo "bom=$(cat ${{ matrix.project }}-docker_bom.json)"  >> "$GITHUB_OUTPUT"
+        run: >
+          cdxgen
+          --type docker
+          --format json
+          --spec-version="${{matrix.cdx_spec_version}}"
+          --project-name="${{ matrix.project }}"
+          --project-version="build-${{ github.run_number }}"
+          -o "${{ matrix.project }}-docker_bom.json"
+          ${{ matrix.project }}:latest
+
 
       - name: upload Artifacts
         uses: actions/upload-artifact@v4
@@ -77,13 +95,13 @@ jobs:
           retention-days: 5
           if-no-files-found: error
 
+
+## Exercise Merge multiple SBOMs
   merge-sbom:
     name: Merge previously generated SBOM
     runs-on: ubuntu-latest
     needs: ["sbom", "sbom-docker"]
-    container: cyclonedx/cyclonedx-cli:0.25.0
-    # outputs:
-    #   sbom-merge: ${{ steps.merge_sbom.outputs }}
+    container: cyclonedx/cyclonedx-cli:0.27.1
     strategy:
       fail-fast: false
       matrix:
@@ -103,9 +121,14 @@ jobs:
           path: ./sboms-${{matrix.project}}
 
       - name: Merge previously generated sboms
-        # id: "merge_sbom"
-        run: |
-          cyclonedx merge --input-files sboms-${{matrix.project}}/${{ matrix.project }}_bom.json sboms-${{matrix.project}}/${{ matrix.project }}-docker_bom.json --output-file ${{ matrix.project }}_merged_sbom.json --hierarchical --name ${{ matrix.project }} --version ${{ github.run_number }} --group devsecops-exercises
+        run: >
+          cyclonedx merge
+          --input-files sboms-${{matrix.project}}/${{ matrix.project }}_bom.json sboms-${{matrix.project}}/${{ matrix.project }}-docker_bom.json
+          --output-file ${{ matrix.project }}_merged_sbom.json
+          --hierarchical
+          --name ${{ matrix.project }}
+          --version "build-${{ github.run_number }}"
+          --group devsecops-exercises
 
       - name: upload Artifacts
         uses: actions/upload-artifact@v4

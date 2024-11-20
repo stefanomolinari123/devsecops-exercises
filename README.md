@@ -1,6 +1,6 @@
 # devsecops-exercises
 
-Questa repository nasce per raccogliere gli esercizi e per fornire le istruzioni operative utili ad arrivare preparati al corso *Integrate Vulnerability Management in DevSecOps cycle* 
+Questa repository nasce per raccogliere gli esercizi e per fornire le istruzioni operative utili ad arrivare preparati al corso *Integrate Vulnerability Management in DevSecOps cycle*
 
 ## Prerequisiti Base 
 Per poter effettuare le operazioni richieste negli esercizi è necessario avere un account GitHub (è free):  
@@ -75,6 +75,9 @@ https://github.com/OWASP/threat-dragon
 
 ## VEX generation
 **osv scanner** - https://github.com/google/osv-scanner  
+**trivy** - https://github.com/aquasecurity/trivy
+
+## K8s cluster KBOM and scan
 **trivy** - https://github.com/aquasecurity/trivy
 
 ## Continuous Security Monitoring

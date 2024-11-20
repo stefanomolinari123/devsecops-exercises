@@ -8,11 +8,21 @@ jobs:
   sbom-vex-scan:
     name: SBOM/VEX Generation
     runs-on: ubuntu-latest
-    container: quay.io/pluribus_one/sbom_vex_scanner:latest
     strategy:
       fail-fast: false
       matrix:
-        prj_folder: [ "dvna", "vulnado" ]
+        project: [ "dvna", "vulnado" ]
+        cdx_spec_version: ["1.5"]
+        include:
+          - project: vulnado
+            cdx_spec_version: "1.5"
+            cdx_image: ghcr.io/cyclonedx/cdxgen-java:v10
+          - project: dvna
+            cdx_spec_version: "1.5"
+            cdx_image:  quay.io/pluribus_one/sbom_vex_scanner@sha256:4c93316f95a2fe12bd2683ec34ff36d8e3a29501c797fb4825e7e510bab29ce3
+
+    container:
+      image: ${{matrix.cdx_image}}
 
     steps:
       - name: Checkout Repository
@@ -20,27 +30,26 @@ jobs:
 
       - name: Generate SBOMs
         run: |
-          cd vuln_apps/${{ matrix.prj_folder }}
-          cdxgen --format json -o "${{ matrix.prj_folder }}_bom.json" --spec-version=1.4
+          cd vuln_apps/${{ matrix.project }}
+          cdxgen \
+          --format json \
+          --spec-version="${{matrix.cdx_spec_version}}" \
+          --project-name="${{ matrix.project }}" \
+          --project-version="build-${{ github.run_number }}" \
+          -o "${{ matrix.project }}_bom.json"
 
       - name: Generate VEXs (JSON)
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.28.0
         with:
-          scan-type: "sbom vuln_apps/${{ matrix.prj_folder }}/${{ matrix.prj_folder }}_bom.json"
-          format: "cyclonedx"
-          output: "vuln_apps/${{ matrix.prj_folder }}/${{ matrix.prj_folder }}_vex.json"
-
-      - name: Generate VEXs (Human)
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: "sbom vuln_apps/${{ matrix.prj_folder }}/${{ matrix.prj_folder }}_bom.json"
-          format: "table"
-          output: "vuln_apps/${{ matrix.prj_folder }}/${{ matrix.prj_folder }}_vex_human"
+          scan-type: "fs"
+          scan-ref: "./vuln_apps/${{ matrix.project }}/${{ matrix.project }}_bom.json"
+          format: cyclonedx
+          output: "vuln_apps/${{ matrix.project }}/${{ matrix.project }}_vex.json"
 
       - name: Upload results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: sbom-vex-jsons
-          path: vuln_apps/**/${{matrix.prj_folder}}_*
+          name: sbom-vex-${{ matrix.project }}-jsons
+          path: vuln_apps/**/${{ matrix.project }}_*
           retention-days: 5

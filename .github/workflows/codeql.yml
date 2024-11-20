@@ -33,7 +33,7 @@ jobs:
 
       # Setup CodeQL tool, with this setup step, we are specifying the language of the scan, and also some extra arguments in a configuration file
       - name: Initialize CodeQL
-        uses: github/codeql-action/init@v2
+        uses: github/codeql-action/init@v3
         with:
           config-file: ./.github/codeql/codeql-config.${{ matrix.language }}.yml
           languages: ${{ matrix.language }}
@@ -41,7 +41,7 @@ jobs:
       # Build the codebase, codeql offer an autobuild steps for most of his supported languages: https://docs.github.com/en/code-security/code-scanning/creating-an-advanced-setup-for-code-scanning/codeql-code-scanning-for-compiled-languages
       - if: matrix.language != 'java-kotlin'
         name: Autobuild
-        uses: github/codeql-action/autobuild@v2
+        uses: github/codeql-action/autobuild@v3
 
       # In case our java project, we are leveraging some project specific needs
       - if: matrix.language == 'java-kotlin'
@@ -52,6 +52,6 @@ jobs:
 
       # Perform the actual code analysis, that will automatic upload GitHub security section
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        uses: github/codeql-action/analyze@v3
         with:
           category: "/language:${{matrix.language}}"
