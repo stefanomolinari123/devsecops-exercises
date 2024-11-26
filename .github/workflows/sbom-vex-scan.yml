@@ -12,17 +12,6 @@ jobs:
       fail-fast: false
       matrix:
         project: [ "dvna", "vulnado" ]
-        cdx_spec_version: ["1.5"]
-        include:
-          - project: vulnado
-            cdx_spec_version: "1.5"
-            cdx_image: ghcr.io/cyclonedx/cdxgen-java:v10
-          - project: dvna
-            cdx_spec_version: "1.5"
-            cdx_image:  quay.io/pluribus_one/sbom_vex_scanner@sha256:4c93316f95a2fe12bd2683ec34ff36d8e3a29501c797fb4825e7e510bab29ce3
-
-    container:
-      image: ${{matrix.cdx_image}}
 
     steps:
       - name: Checkout Repository
@@ -33,7 +22,7 @@ jobs:
         with:
           scan-type: fs
           format: table
-          output: ./vuln_apps/${{ matrix.project }}/${{ matrix.project }}_human.vex.json
+          output: ${{ matrix.project }}.vex
           scan-ref: ./vuln_apps/${{ matrix.project }}
         env:
           TRIVY_DB: "ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db"
@@ -43,6 +32,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: sbom-vex-${{ matrix.project }}
-          path: vuln_apps/**/${{ matrix.project }}_human.vex.json
+          name: vex-${{ matrix.project }}
+          path: ${{ matrix.project }}.vex
           retention-days: 5
