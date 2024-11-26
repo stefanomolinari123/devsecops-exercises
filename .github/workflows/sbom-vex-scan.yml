@@ -25,8 +25,8 @@ jobs:
           output: ${{ matrix.project }}.vex
           scan-ref: ./vuln_apps/${{ matrix.project }}
         env:
-          TRIVY_DB: "ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db"
-          TRIVY_JAVA_DB: "ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db"
+          TRIVY_DB_REPOSITORY: "ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db"
+          TRIVY_JAVA_DB_REPOSITORY: "ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db"
 
       - name: Upload results
         if: always()
