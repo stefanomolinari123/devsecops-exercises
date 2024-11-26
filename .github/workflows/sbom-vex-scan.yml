@@ -41,19 +41,11 @@ jobs:
       - name: Generate VEXs (JSON)
         uses: aquasecurity/trivy-action@0.28.0
         with:
-          scan-type: "fs"
-          scan-ref: "./vuln_apps/${{ matrix.project }}/${{ matrix.project }}_bom.json"
-          format: cyclonedx
-          output: "vuln_apps/${{ matrix.project }}/${{ matrix.project }}_vex.json"
-
-      - name: Generate VEXs (Human)
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          scan-type: "fs"
-          scan-ref: "./vuln_apps/${{ matrix.project }}/${{ matrix.project }}_bom.json"
-          format: table
-          output: "vuln_apps/${{ matrix.project }}/${{ matrix.project }}_human_vex.json"
-
+          scan-type: 'fs'
+          format: 'github'
+          output: 'dependency-results.sbom.json'
+          image-ref: '.'
+          github-pat: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload results
         if: always()
