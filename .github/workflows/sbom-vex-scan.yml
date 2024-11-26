@@ -41,9 +41,13 @@ jobs:
         uses: aquasecurity/trivy-action@0.28.0
         with:
           scan-type: fs
-          format: table
+          format: github
           output: ./vuln_apps/${{ matrix.project }}/${{ matrix.project }}_human.vex.json
           scan-ref: ./vuln_apps/${{ matrix.project }}
+          github-pat: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          TRIVY_DB: "ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db"
+          TRIVY_JAVA_DB: "ghcr.io/aquasecurity/trivy-java-db,public.ecr.aws/aquasecurity/trivy-java-db"
 
       - name: Upload results
         if: always()
