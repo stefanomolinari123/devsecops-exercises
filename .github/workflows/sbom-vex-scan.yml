@@ -28,16 +28,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Generate SBOMs
-        run: |
-          cd vuln_apps/${{ matrix.project }}
-          cdxgen \
-          --format json \
-          --spec-version="${{matrix.cdx_spec_version}}" \
-          --project-name="${{ matrix.project }}" \
-          --project-version="build-${{ github.run_number }}" \
-          -o "${{ matrix.project }}_bom.json"
-
       - name: Generate VEXs (JSON)
         uses: aquasecurity/trivy-action@0.28.0
         with:
