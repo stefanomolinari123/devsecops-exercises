@@ -37,14 +37,6 @@ jobs:
       #     scan-ref: ./vuln_apps/${{ matrix.project }}
       #     github-pat: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Generate VEXs (JSON)
-        uses: aquasecurity/trivy-action@0.28.0
-        with:
-          scan-type: fs
-          format: json
-          output: ./vuln_apps/${{ matrix.project }}/${{ matrix.project }}.vex.json
-          scan-ref: ./vuln_apps/${{ matrix.project }}
-
       - name: Generate VEXs (Human)
         uses: aquasecurity/trivy-action@0.28.0
         with:
@@ -58,5 +50,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: sbom-vex-${{ matrix.project }}
-          path: vuln_apps/**/${{ matrix.project }}*vex*
+          path: vuln_apps/**/${{ matrix.project }}*.vex
           retention-days: 5
