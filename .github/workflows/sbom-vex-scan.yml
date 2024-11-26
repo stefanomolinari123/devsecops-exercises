@@ -46,6 +46,14 @@ jobs:
           format: cyclonedx
           output: "vuln_apps/${{ matrix.project }}/${{ matrix.project }}_vex.json"
 
+      - name: Generate VEXs (JSON)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: "fs"
+          scan-ref: "./vuln_apps/${{ matrix.project }}/${{ matrix.project }}_bom.json"
+          format: table
+          output: "vuln_apps/${{ matrix.project }}/${{ matrix.project }}_vex.json"
+
       - name: Upload results
         if: always()
         uses: actions/upload-artifact@v4
