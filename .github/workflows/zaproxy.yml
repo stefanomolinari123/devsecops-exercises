@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        cluster_ip: [18.185.179.187]
+        cluster_ip: ["${{ secrets.CLUSTER_IP }}"]
         port: [31546,31547]
 
     steps:
