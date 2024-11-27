@@ -11,12 +11,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        cluster_ip_secret_key: [CLUSTER_IP]
         port: [31546,31547]
 
     steps:
       - name: ZAP Scan
         uses: zaproxy/action-full-scan@v0.11.0
         with:
-          target: http://${{ secrets[matrix.cluster_ip_secret_key] }}:${{ matrix.port}}
-          artifact_name: zap_scan_${{ secrets[matrix.cluster_ip_secret_key] }}_${{ matrix.port }}
+          target: http://${{ secrets.CLUSTER_IP }}:${{ matrix.port}}
+          artifact_name: zap_scan_${{ secrets.CLUSTER_IP] }}_${{ matrix.port }}
