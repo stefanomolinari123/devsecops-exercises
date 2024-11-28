@@ -75,14 +75,14 @@ jobs:
            tags: ${{ matrix.project }}:latest
 
        - name: Generate docker SBOMs
-         run: >
+         run: |
            cdxgen
            --type docker
            --format json
-           --spec-version="1.5"
-           --project-name="${{ project }}"
+           --spec-version="${ {matrix.cdx_spec_version} }"
+           --project-name="${{ matrix.project }}"
            --project-version="build-${{ github.run_number }}"
-           -o "${{ project }}-docker_bom.json"
+           -o "${{ matrix.project }}-docker_bom.json" ${ {matrix.project} }:latest
            image:tag
        - name: upload Artifacts
          uses: actions/upload-artifact@v4
