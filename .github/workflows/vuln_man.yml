@@ -82,7 +82,8 @@ jobs:
            --spec-version="${ {matrix.cdx_spec_version} }"
            --project-name="${{ matrix.project }}"
            --project-version="build-${{ github.run_number }}"
-           -o "${{ matrix.project }}-docker_bom.json" ${ {matrix.project} }:latest
+           -o "${{ matrix.project }}-docker_bom.json" 
+           ${ {matrix.project} }:latest
            image:tag
        - name: upload Artifacts
          uses: actions/upload-artifact@v4
