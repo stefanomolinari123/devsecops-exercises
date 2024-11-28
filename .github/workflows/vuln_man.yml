@@ -84,7 +84,7 @@ jobs:
            --project-version="build-${{ github.run_number }}"
            -o "${{ matrix.project }}-docker_bom.json" 
            ${ {matrix.project} }:latest
-           image:tag
+           
        - name: upload Artifacts
          uses: actions/upload-artifact@v4
          with:
