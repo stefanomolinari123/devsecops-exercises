@@ -17,5 +17,5 @@ jobs:
       - name: ZAP Scan
         uses: zaproxy/action-full-scan@v0.11.0
         with:
-          target: http://${{ secrets.CLUSTER_IP }}:${{ matrix.port}}
-          artifact_name: zap_scan_{{ 3.76.219.129 }}_${{ matrix.port }}
+          target: http://3.76.219.129:${{ matrix.port}}
+          artifact_name: zap_scan_3.76.219.129_${{ matrix.port }}
